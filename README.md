@@ -1,1 +1,0 @@
-# minimal-artificial-life
