@@ -1,57 +1,320 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Minimal Artificial Life v0.2</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#07162d"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png"/>
+<link rel="icon" type="image/png" href="./apple-touch-icon.png"/>
+<meta name="apple-mobile-web-app-title" content="Minimal Life"/>
+<meta name="application-name" content="Minimal Life"/>
+<title>Minimal Artificial Life v0.3</title>
 <style>
-:root{--bg:#07162d;--panel:rgba(18,42,78,.72);--line:rgba(141,190,255,.22);--text:#d8e8ff;--muted:#87a7d0;--cyan:#88e8ff;--cyan2:#5eb9ff;--glow:#70e7ff;--food:#86f3e6}
-*{box-sizing:border-box} html,body{margin:0;min-height:100%;background:radial-gradient(circle at 30% 20%,#173d74 0,#0b2447 30%,#07162d 72%);color:var(--text);font-family:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif}
-body{padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
-.app{max-width:1180px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:8px 2px 14px}.title{font-size:20px;letter-spacing:.08em;font-weight:500}.run{font-size:13px;color:#86f2c5;display:flex;gap:8px;align-items:center}.run i{width:8px;height:8px;background:#72e4b6;border-radius:50%;box-shadow:0 0 12px #72e4b6}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px}.world{position:relative;overflow:hidden;border-radius:26px;border:1px solid rgba(113,181,255,.45);background:linear-gradient(180deg,rgba(21,57,105,.54),rgba(7,22,45,.72));box-shadow:inset 0 0 70px rgba(62,132,232,.09),0 24px 70px rgba(0,0,0,.25);min-height:650px}
-.world:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 18%,rgba(126,211,255,.14) 0 2px,transparent 3px),radial-gradient(circle at 70% 28%,rgba(126,211,255,.11) 0 1px,transparent 2px);background-size:170px 150px,110px 120px;pointer-events:none;opacity:.7}
-canvas{width:100%;height:650px;display:block}.dead{position:absolute;inset:0;display:none;place-items:center;background:rgba(3,11,24,.48);backdrop-filter:blur(5px)}.deadbox{padding:18px 24px;border:1px solid var(--line);border-radius:18px;background:rgba(10,29,56,.9);text-align:center;box-shadow:0 0 40px rgba(91,204,255,.1)}
-.side{display:flex;flex-direction:column;gap:14px}.card{border-radius:22px;padding:18px;background:linear-gradient(180deg,rgba(28,58,101,.72),rgba(18,40,76,.72));border:1px solid var(--line);box-shadow:inset 0 1px rgba(255,255,255,.05),0 16px 34px rgba(0,0,0,.14);backdrop-filter:blur(16px)}.card h2{margin:0 0 15px;font-size:16px;font-weight:600;letter-spacing:.03em}.row{display:flex;justify-content:space-between;gap:16px;margin:10px 0;font-size:13px}.label{color:var(--muted)}.value{font-variant-numeric:tabular-nums}.big{font-size:20px}.bar{height:12px;border:1px solid rgba(123,180,250,.32);border-radius:999px;background:#0a1830;overflow:hidden;margin:8px 0 16px}.fill{height:100%;width:100%;border-radius:inherit;background:linear-gradient(90deg,#6fc7ff,#9ff5ff);box-shadow:0 0 16px rgba(111,199,255,.5)}.divider{height:1px;background:var(--line);margin:14px 0}.food-preview{display:flex;align-items:center;gap:13px}.orb{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#dfffff 0 7%,#87f4e8 20%,#4abac8 55%,rgba(89,220,223,.14) 72%);box-shadow:0 0 20px rgba(119,244,236,.65)}.mini{font-size:12px;line-height:1.65;color:#a9c5e7}button{width:100%;border:1px solid rgba(139,190,255,.22);border-radius:14px;padding:12px 14px;margin-top:9px;background:linear-gradient(180deg,rgba(80,120,183,.34),rgba(48,83,139,.28));color:#d9eaff;font:inherit;cursor:pointer;box-shadow:inset 0 1px rgba(255,255,255,.05)}button:active{transform:translateY(1px)}.foot{margin:12px 3px 0;color:#6f8eb5;font-size:11px;letter-spacing:.03em}.tag{font-size:11px;color:#9bdfff;border:1px solid rgba(109,200,255,.25);padding:4px 8px;border-radius:999px;margin-left:8px}
-@media(max-width:820px){body{padding:10px}.top{align-items:flex-start}.title{font-size:16px}.layout{grid-template-columns:1fr}.world,.world canvas{min-height:58vh;height:58vh}.side{display:grid;grid-template-columns:1fr 1fr}.card.controls{grid-column:1/-1}.foot{padding-bottom:8px}}
-@media(max-width:520px){.side{grid-template-columns:1fr}.card.controls{grid-column:auto}.run{font-size:12px}.world,.world canvas{min-height:54vh;height:54vh}}
+:root{
+  --bg:#07162d;--panel:rgba(18,42,78,.72);--line:rgba(141,190,255,.22);
+  --text:#d8e8ff;--muted:#87a7d0;--cyan:#88e8ff;--green:#7cf0c2;--danger:#ff9d9d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 30% 20%,#173d74 0,#0b2447 30%,#07162d 72%);color:var(--text);font-family:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif}
+body{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));overflow-x:hidden}
+.app{max-width:1280px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:5px 2px 10px}
+.title{font-size:18px;letter-spacing:.06em;font-weight:600}
+.tag{font-size:10px;color:#9bdfff;border:1px solid rgba(109,200,255,.25);padding:4px 8px;border-radius:999px;margin-left:8px}
+.run{font-size:12px;color:#86f2c5;display:flex;gap:7px;align-items:center;white-space:nowrap}.run i{width:8px;height:8px;background:#72e4b6;border-radius:50%;box-shadow:0 0 12px #72e4b6}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:14px}
+.world{position:relative;overflow:hidden;border-radius:24px;border:1px solid rgba(113,181,255,.45);background:linear-gradient(180deg,rgba(21,57,105,.54),rgba(7,22,45,.72));box-shadow:inset 0 0 70px rgba(62,132,232,.09),0 24px 70px rgba(0,0,0,.25);min-height:620px;touch-action:none}
+canvas{width:100%;height:620px;display:block;touch-action:none}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{border-radius:20px;padding:16px;background:linear-gradient(180deg,rgba(28,58,101,.72),rgba(18,40,76,.72));border:1px solid var(--line);box-shadow:inset 0 1px rgba(255,255,255,.05),0 16px 34px rgba(0,0,0,.14);backdrop-filter:blur(16px)}
+.card h2{margin:0 0 12px;font-size:15px}
+.row{display:flex;justify-content:space-between;gap:14px;margin:8px 0;font-size:12px}
+.label{color:var(--muted)} .value{font-variant-numeric:tabular-nums}
+.big{font-size:19px}
+.bar{height:11px;border:1px solid rgba(123,180,250,.32);border-radius:999px;background:#0a1830;overflow:hidden;margin:7px 0 12px}
+.fill{height:100%;width:100%;border-radius:inherit;background:linear-gradient(90deg,#6fc7ff,#9ff5ff);box-shadow:0 0 16px rgba(111,199,255,.5)}
+.divider{height:1px;background:var(--line);margin:11px 0}
+.fooddots{display:flex;gap:8px;align-items:center}.dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(170,230,255,.35)}.dot.on{background:#87f4e8;box-shadow:0 0 12px rgba(135,244,232,.75)}
+button{width:100%;border:1px solid rgba(139,190,255,.22);border-radius:13px;padding:11px 12px;margin-top:8px;background:linear-gradient(180deg,rgba(80,120,183,.34),rgba(48,83,139,.28));color:#d9eaff;font:inherit;cursor:pointer}
+button:disabled{opacity:.42;cursor:not-allowed}
+button:active{transform:translateY(1px)}
+.hint{font-size:11px;line-height:1.55;color:#86a4ca}
+.dead{position:absolute;inset:0;display:none;place-items:center;background:rgba(3,11,24,.58);backdrop-filter:blur(5px)}
+.deadbox{padding:20px 22px;border:1px solid var(--line);border-radius:18px;background:rgba(10,29,56,.92);text-align:center;max-width:320px}
+.deadname{font-size:22px;margin-bottom:6px}
+.archive{max-height:180px;overflow:auto}
+.past{font-size:11px;padding:9px 0;border-top:1px solid rgba(141,190,255,.12)} .past:first-child{border-top:0}
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(3,9,20,.72);backdrop-filter:blur(6px);z-index:20;padding:18px}
+.modalbox{width:min(420px,92vw);border-radius:22px;background:#0b2447;border:1px solid var(--line);padding:20px}
+.modalbox h2{margin-top:0}
+input{width:100%;border:1px solid rgba(139,190,255,.25);background:#081a34;color:var(--text);border-radius:12px;padding:12px 13px;font:inherit;outline:none}
+.foot{margin:10px 3px 0;color:#6f8eb5;font-size:10px}
+@media (orientation:portrait) and (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .world,canvas{height:56vh;min-height:56vh}
+  .side{display:grid;grid-template-columns:1fr 1fr}
+  .card.controls{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .side{grid-template-columns:1fr}
+  .card.controls{grid-column:auto}
+  .title{font-size:15px}
+}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="title">✦ Minimal Artificial Life <span class="tag">v0.2 · Blue Life</span></div><div class="run"><i></i><span id="topState">運作中</span> · <span id="time">00:00</span></div></div>
+  <div class="top">
+    <div class="title">✦ Minimal Artificial Life <span class="tag">v0.3 · Individual Life</span></div>
+    <div class="run"><i></i><span id="topState">運作中</span> · <span id="clock">00:00</span></div>
+  </div>
+
   <div class="layout">
-    <div class="world"><canvas id="world"></canvas><div class="dead" id="dead"><div class="deadbox"><strong>Energy = 0</strong><div style="margin-top:6px;color:#93afd2;font-size:13px">生物停止活動。</div></div></div></div>
+    <div class="world" id="worldWrap">
+      <canvas id="world"></canvas>
+      <div class="dead" id="dead">
+        <div class="deadbox">
+          <div class="deadname" id="deadName"></div>
+          <div style="color:#a9c5e7;font-size:12px;line-height:1.7" id="deathText"></div>
+          <button id="newLifeFromDeath">Birth New Life</button>
+        </div>
+      </div>
+    </div>
+
     <aside class="side">
-      <section class="card"><h2>Life Status</h2><div class="row"><span class="label">Energy</span><span class="value big"><span id="energy">100</span> / 100</span></div><div class="bar"><div class="fill" id="fill"></div></div><div class="divider"></div><div class="row"><span class="label">State</span><span class="value" id="state">Alive</span></div><div class="row"><span class="label">Position</span><span class="value" id="position">(0, 0)</span></div><div class="row"><span class="label">Food Eaten</span><span class="value" id="eaten">0</span></div></section>
-      <section class="card"><h2>Food</h2><div class="food-preview"><div class="orb"></div><div class="mini">Name：Food<br>Energy：+28<br>Type：Resource<br>Spawn：4.5 秒</div></div></section>
-      <section class="card controls"><h2>Controls</h2><button id="add">＋ Add Food</button><button id="pause">Ⅱ Pause / Resume</button><button id="restart">↻ Restart</button></section>
+      <section class="card">
+        <h2 id="lifeName">Unnamed Life</h2>
+        <div class="row"><span class="label">Day</span><span class="value" id="day">1</span></div>
+        <div class="row"><span class="label">Alive for</span><span class="value" id="aliveFor">0m</span></div>
+        <div class="row"><span class="label">Energy</span><span class="value big"><span id="energy">100</span> / 100</span></div>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <div class="row"><span class="label">State</span><span class="value" id="state">Alive</span></div>
+        <div class="row"><span class="label">Food Eaten</span><span class="value" id="eaten">0</span></div>
+      </section>
+
+      <section class="card">
+        <h2>Daily Food</h2>
+        <div class="row"><span class="label">今日剩餘</span><span class="value"><span id="foodLeft">3</span> / 3</span></div>
+        <div class="fooddots" id="foodDots"></div>
+        <button id="addFood">＋ Add Food</button>
+        <div class="hint" style="margin-top:8px">每天最多投放 3 份，不累積到隔天。</div>
+      </section>
+
+      <section class="card">
+        <h2>Environment</h2>
+        <div class="hint">滑動水面：產生短暫水流。<br>點擊水面：產生漣漪。<br>你不能直接控制牠，只能改變牠所在的世界。</div>
+      </section>
+
+      <section class="card">
+        <h2>Past Lives</h2>
+        <div class="archive" id="archive"></div>
+      </section>
+
+      <section class="card controls">
+        <h2>Controls</h2>
+        <button id="pause">Ⅱ Pause / Resume</button>
+        <button id="birth">＋ Birth New Life</button>
+      </section>
     </aside>
   </div>
-  <div class="foot">核心規則：移動會消耗 Energy · 碰到 Food 恢復 Energy · Energy 歸零則停止。沒有感知、追逐、記憶或學習。</div>
+
+  <div class="foot">生命會跨日保存；離線時以低代謝消耗 Energy。死亡不可逆，下一次出生的是另一個個體。</div>
 </div>
+
+<div class="modal" id="modal">
+  <div class="modalbox">
+    <h2>Birth New Life</h2>
+    <div class="hint" style="margin-bottom:10px">替這一隻生命取一個名字。</div>
+    <input id="nameInput" maxlength="24" placeholder="例如 Mori"/>
+    <button id="confirmBirth">Birth</button>
+  </div>
+</div>
+
 <script>
 (()=>{
-const FOOD_CONFIG={name:'Food',radius:8,nutrition:28,spawnEvery:4.5,specialEffect:null};
-const CREATURE_CONFIG={radius:18,maxEnergy:100,startEnergy:100,energyDrainPerSecond:2.2,speed:52,turnNoise:1.35};
-const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');
-const ui={time:document.getElementById('time'),topState:document.getElementById('topState'),energy:document.getElementById('energy'),fill:document.getElementById('fill'),state:document.getElementById('state'),position:document.getElementById('position'),eaten:document.getElementById('eaten'),dead:document.getElementById('dead'),add:document.getElementById('add'),pause:document.getElementById('pause'),restart:document.getElementById('restart')};
-let world,last=performance.now(),paused=false,particles=[];
-function resize(){const r=canvas.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);particles=Array.from({length:46},()=>({x:Math.random()*r.width,y:Math.random()*r.height,s:.5+Math.random()*1.4,a:.12+Math.random()*.35}));}
+const FOOD_CONFIG={radius:8,nutrition:28,spawnEvery:null};
+const C={radius:18,maxEnergy:100,startEnergy:100,onlineDrain:0.22,offlineDrainPerHour:0.32,speed:48,turnNoise:1.35};
+const DAILY_FOOD=3;
+const KEY='minimal-life-v03';
+const ARCHIVE_KEY='minimal-life-v03-archive';
+
+const canvas=document.getElementById('world'),ctx=canvas.getContext('2d'),wrap=document.getElementById('worldWrap');
+const $=id=>document.getElementById(id);
+const ui={topState:$('topState'),clock:$('clock'),lifeName:$('lifeName'),day:$('day'),aliveFor:$('aliveFor'),energy:$('energy'),fill:$('fill'),state:$('state'),eaten:$('eaten'),foodLeft:$('foodLeft'),foodDots:$('foodDots'),addFood:$('addFood'),pause:$('pause'),birth:$('birth'),archive:$('archive'),dead:$('dead'),deadName:$('deadName'),deathText:$('deathText'),newLifeFromDeath:$('newLifeFromDeath'),modal:$('modal'),nameInput:$('nameInput'),confirmBirth:$('confirmBirth')};
+
+let world=null,last=performance.now(),paused=false,particles=[],effects=[],pointerDown=null;
+
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function now(){return Date.now()}
+function fmtDuration(ms){
+  const s=Math.max(0,Math.floor(ms/1000)),d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60);
+  if(d>0)return `${d}d ${h}h ${m}m`; if(h>0)return `${h}h ${m}m`; return `${m}m`;
+}
+function resize(){
+  const r=canvas.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);
+  canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);
+  particles=Array.from({length:52},()=>({x:Math.random()*r.width,y:Math.random()*r.height,s:.5+Math.random()*1.3,a:.12+Math.random()*.34}));
+}
 function bounds(){const r=canvas.getBoundingClientRect();return{w:r.width,h:r.height}}
-function food(){const {w,h}=bounds(),m=28;return{x:m+Math.random()*(w-m*2),y:m+Math.random()*(h-m*2),phase:Math.random()*6.28,config:FOOD_CONFIG}}
-function creature(){const {w,h}=bounds();return{x:w*.5,y:h*.5,angle:Math.random()*6.28,energy:100,alive:true,eaten:0,phase:0}}
-function reset(){resize();world={elapsed:0,spawnClock:0,foods:[food(),food(),food()],creature:creature()};paused=false;ui.dead.style.display='none';last=performance.now();renderUI()}
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-function update(dt){if(!world||paused)return;world.elapsed+=dt;const c=world.creature;if(!c.alive)return;c.phase+=dt*3.2;world.spawnClock+=dt;if(world.spawnClock>=FOOD_CONFIG.spawnEvery){world.spawnClock=0;world.foods.push(food())}c.angle+=(Math.random()-.5)*CREATURE_CONFIG.turnNoise*dt;const {w,h}=bounds();c.x+=Math.cos(c.angle)*CREATURE_CONFIG.speed*dt;c.y+=Math.sin(c.angle)*CREATURE_CONFIG.speed*dt;const r=CREATURE_CONFIG.radius;if(c.x<r){c.x=r;c.angle=Math.PI-c.angle}if(c.x>w-r){c.x=w-r;c.angle=Math.PI-c.angle}if(c.y<r){c.y=r;c.angle=-c.angle}if(c.y>h-r){c.y=h-r;c.angle=-c.angle}c.energy=clamp(c.energy-CREATURE_CONFIG.energyDrainPerSecond*dt,0,100);for(let i=world.foods.length-1;i>=0;i--){const f=world.foods[i],dx=c.x-f.x,dy=c.y-f.y,hit=r+f.config.radius;if(dx*dx+dy*dy<=hit*hit){c.energy=clamp(c.energy+f.config.nutrition,0,100);c.eaten++;world.foods.splice(i,1)}}if(c.energy<=0){c.alive=false;ui.dead.style.display='grid'}}
-function glowDot(x,y,r,a=1){ctx.save();ctx.shadowColor='#79f1ed';ctx.shadowBlur=18;const g=ctx.createRadialGradient(x-r*.3,y-r*.3,1,x,y,r);g.addColorStop(0,`rgba(232,255,255,${a})`);g.addColorStop(.25,`rgba(137,246,234,${.95*a})`);g.addColorStop(.7,`rgba(77,171,205,${.65*a})`);g.addColorStop(1,'rgba(71,151,203,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*1.45,0,6.28);ctx.fill();ctx.restore()}
-function drawFood(f,t){const pulse=1+Math.sin(t*2+f.phase)*.08;glowDot(f.x,f.y,f.config.radius*pulse,.9)}
-function fin(x,y,rx,ry,rot,alpha=.55){ctx.save();ctx.translate(x,y);ctx.rotate(rot);const g=ctx.createLinearGradient(-rx,0,rx,0);g.addColorStop(0,`rgba(104,199,255,${alpha*.2})`);g.addColorStop(.5,`rgba(161,231,255,${alpha})`);g.addColorStop(1,'rgba(91,145,255,.06)');ctx.fillStyle=g;ctx.strokeStyle='rgba(186,236,255,.42)';ctx.lineWidth=.7;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,6.28);ctx.fill();ctx.stroke();ctx.restore()}
-function drawCreature(c){ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.angle);const breathe=1+Math.sin(c.phase)*.045;ctx.scale(breathe,1/breathe);ctx.shadowColor='#79dcff';ctx.shadowBlur=22;fin(-8,-16,12,6,-.7,.5);fin(1,-18,14,6,-.45,.5);fin(10,-14,12,5,-.2,.42);fin(-8,16,11,5,.65,.34);const body=ctx.createRadialGradient(8,-9,3,0,0,30);body.addColorStop(0,'rgba(207,250,255,.96)');body.addColorStop(.22,'rgba(111,217,255,.94)');body.addColorStop(.58,'rgba(74,139,235,.88)');body.addColorStop(1,'rgba(69,83,187,.72)');ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(26,0);ctx.bezierCurveTo(18,-18,-9,-23,-25,-10);ctx.bezierCurveTo(-35,-2,-31,12,-18,17);ctx.bezierCurveTo(-2,23,18,15,26,0);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='rgba(196,246,255,.34)';for(const [x,y,r] of [[4,-7,4],[-6,-3,3],[7,5,3],[-12,6,2.5]]){ctx.beginPath();ctx.arc(x,y,r,0,6.28);ctx.fill()}ctx.strokeStyle='rgba(166,238,255,.95)';ctx.lineWidth=1.6;for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(-22,s*5);ctx.quadraticCurveTo(-31,s*11,-34,s*15);ctx.stroke();ctx.fillStyle='#baf7ff';ctx.beginPath();ctx.arc(-34,s*15,2.2,0,6.28);ctx.fill()}ctx.fillStyle='#0b2148';ctx.beginPath();ctx.arc(-20,-4,2.2,0,6.28);ctx.arc(-20,4,2.2,0,6.28);ctx.fill();ctx.restore()}
-function render(ts){const {w,h}=bounds();ctx.clearRect(0,0,w,h);for(const p of particles){ctx.fillStyle=`rgba(130,208,255,${p.a})`;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,6.28);ctx.fill()}for(const f of world.foods)drawFood(f,ts/1000);drawCreature(world.creature)}
-function renderUI(){if(!world)return;const c=world.creature,sec=Math.floor(world.elapsed),m=String(Math.floor(sec/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');ui.time.textContent=`${m}:${s}`;ui.energy.textContent=c.energy.toFixed(0);ui.fill.style.width=`${c.energy}%`;ui.state.textContent=c.alive?'Alive':'Stopped';ui.state.style.color=c.alive?'#7cf0c2':'#ff9d9d';ui.topState.textContent=paused?'暫停':(c.alive?'運作中':'停止');ui.position.textContent=`(${Math.round(c.x)}, ${Math.round(c.y)})`;ui.eaten.textContent=c.eaten}
+function randomFood(){const b=bounds(),m=30;return{x:m+Math.random()*(b.w-m*2),y:m+Math.random()*(b.h-m*2),phase:Math.random()*Math.PI*2}}
+function newCreature(){const b=bounds();return{x:b.w*.5,y:b.h*.5,angle:Math.random()*6.28,energy:100,eaten:0,alive:true,phase:0}}
+function getArchive(){try{return JSON.parse(localStorage.getItem(ARCHIVE_KEY)||'[]')}catch{return[]}}
+function saveArchive(a){localStorage.setItem(ARCHIVE_KEY,JSON.stringify(a))}
+function save(){
+  if(!world)return;
+  world.lastSavedAt=now();
+  localStorage.setItem(KEY,JSON.stringify(world));
+}
+function archiveCurrent(){
+  if(!world||!world.creature||world.archived)return;
+  const c=world.creature;
+  const a=getArchive();
+  a.unshift({name:world.name,bornAt:world.bornAt,diedAt:world.diedAt,lived:world.diedAt-world.bornAt,eaten:c.eaten});
+  saveArchive(a.slice(0,50));world.archived=true;save();
+}
+function applyOffline(world){
+  if(!world?.creature?.alive)return;
+  const elapsed=Math.max(0,(now()-(world.lastSavedAt||now()))/3600000);
+  if(elapsed<=0)return;
+  world.creature.energy=Math.max(0,world.creature.energy-elapsed*C.offlineDrainPerHour);
+  if(world.creature.energy<=0){
+    world.creature.alive=false;world.diedAt=now();
+  }
+}
+function load(){
+  resize();
+  const raw=localStorage.getItem(KEY);
+  if(!raw){openBirth();return}
+  try{
+    world=JSON.parse(raw);
+    if(world.foodDate!==todayKey()){world.foodDate=todayKey();world.foodUsed=0}
+    applyOffline(world);
+    if(!world.creature.alive && !world.archived)archiveCurrent();
+    ensurePosition();renderArchive();showDeathIfNeeded();save();
+  }catch{openBirth()}
+}
+function ensurePosition(){
+  if(!world)return; const b=bounds(),c=world.creature;
+  c.x=Math.min(Math.max(c.x||b.w*.5,20),b.w-20);c.y=Math.min(Math.max(c.y||b.h*.5,20),b.h-20);
+}
+function birth(name){
+  const clean=(name||'Unnamed').trim()||'Unnamed';
+  world={name:clean,bornAt:now(),diedAt:null,lastSavedAt:now(),foodDate:todayKey(),foodUsed:0,foods:[randomFood(),randomFood()],creature:newCreature(),archived:false};
+  ui.modal.style.display='none';ui.dead.style.display='none';paused=false;save();renderArchive();
+}
+function openBirth(){ui.nameInput.value='';ui.modal.style.display='grid';setTimeout(()=>ui.nameInput.focus(),50)}
+function showDeathIfNeeded(){
+  if(!world||world.creature.alive){ui.dead.style.display='none';return}
+  ui.deadName.textContent=world.name;
+  ui.deathText.innerHTML=`Born · ${new Date(world.bornAt).toLocaleString()}<br>Died · ${new Date(world.diedAt).toLocaleString()}<br>Lived · ${fmtDuration(world.diedAt-world.bornAt)}<br>Food eaten · ${world.creature.eaten}`;
+  ui.dead.style.display='grid';
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function addCurrent(x,y,vx,vy,strength=1){effects.push({type:'current',x,y,vx,vy,life:1.8,max:1.8,strength})}
+function addRipple(x,y){effects.push({type:'ripple',x,y,life:1.2,max:1.2})}
+function applyEffects(dt,obj){
+  for(const e of effects){
+    if(e.type==='current'){
+      const dx=obj.x-e.x,dy=obj.y-e.y,d=Math.hypot(dx,dy);
+      if(d<150){const k=(1-d/150)*(e.life/e.max)*e.strength;obj.x+=e.vx*k*dt*55;obj.y+=e.vy*k*dt*55}
+    }else{
+      const dx=obj.x-e.x,dy=obj.y-e.y,d=Math.max(1,Math.hypot(dx,dy));
+      if(d<120){const k=(1-d/120)*(e.life/e.max);obj.x+=(dx/d)*k*dt*48;obj.y+=(dy/d)*k*dt*48}
+    }
+  }
+}
+function update(dt){
+  if(!world||paused)return;
+  if(world.foodDate!==todayKey()){world.foodDate=todayKey();world.foodUsed=0;save()}
+  const c=world.creature;if(!c.alive)return;
+  c.phase+=dt*3.2;c.angle+=(Math.random()-.5)*C.turnNoise*dt;
+  c.x+=Math.cos(c.angle)*C.speed*dt;c.y+=Math.sin(c.angle)*C.speed*dt;
+  applyEffects(dt,c);for(const f of world.foods)applyEffects(dt,f);
+  const b=bounds(),r=C.radius;
+  if(c.x<r){c.x=r;c.angle=Math.PI-c.angle}if(c.x>b.w-r){c.x=b.w-r;c.angle=Math.PI-c.angle}
+  if(c.y<r){c.y=r;c.angle=-c.angle}if(c.y>b.h-r){c.y=b.h-r;c.angle=-c.angle}
+  for(const f of world.foods){f.x=clamp(f.x,12,b.w-12);f.y=clamp(f.y,12,b.h-12)}
+  c.energy=clamp(c.energy-C.onlineDrain*dt,0,100);
+  for(let i=world.foods.length-1;i>=0;i--){
+    const f=world.foods[i],dx=c.x-f.x,dy=c.y-f.y,hit=C.radius+FOOD_CONFIG.radius;
+    if(dx*dx+dy*dy<=hit*hit){c.energy=clamp(c.energy+FOOD_CONFIG.nutrition,0,100);c.eaten++;world.foods.splice(i,1);save()}
+  }
+  effects.forEach(e=>e.life-=dt);effects=effects.filter(e=>e.life>0);
+  if(c.energy<=0){c.alive=false;world.diedAt=now();archiveCurrent();showDeathIfNeeded()}
+}
+function glowDot(x,y,r,a=1){
+  ctx.save();ctx.shadowColor='#79f1ed';ctx.shadowBlur=18;
+  const g=ctx.createRadialGradient(x-r*.3,y-r*.3,1,x,y,r);g.addColorStop(0,`rgba(232,255,255,${a})`);g.addColorStop(.25,`rgba(137,246,234,${.95*a})`);g.addColorStop(.7,`rgba(77,171,205,${.65*a})`);g.addColorStop(1,'rgba(71,151,203,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*1.45,0,6.28);ctx.fill();ctx.restore();
+}
+function fin(x,y,rx,ry,rot,alpha=.55){
+  ctx.save();ctx.translate(x,y);ctx.rotate(rot);
+  const g=ctx.createLinearGradient(-rx,0,rx,0);g.addColorStop(0,`rgba(104,199,255,${alpha*.2})`);g.addColorStop(.5,`rgba(161,231,255,${alpha})`);g.addColorStop(1,'rgba(91,145,255,.06)');
+  ctx.fillStyle=g;ctx.strokeStyle='rgba(186,236,255,.42)';ctx.lineWidth=.7;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,6.28);ctx.fill();ctx.stroke();ctx.restore();
+}
+function drawCreature(c){
+  ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.angle);const breathe=1+Math.sin(c.phase)*.045;ctx.scale(breathe,1/breathe);ctx.shadowColor='#79dcff';ctx.shadowBlur=22;
+  fin(-8,-16,12,6,-.7,.5);fin(1,-18,14,6,-.45,.5);fin(10,-14,12,5,-.2,.42);fin(-8,16,11,5,.65,.34);
+  const body=ctx.createRadialGradient(8,-9,3,0,0,30);body.addColorStop(0,'rgba(207,250,255,.96)');body.addColorStop(.22,'rgba(111,217,255,.94)');body.addColorStop(.58,'rgba(74,139,235,.88)');body.addColorStop(1,'rgba(69,83,187,.72)');
+  ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(26,0);ctx.bezierCurveTo(18,-18,-9,-23,-25,-10);ctx.bezierCurveTo(-35,-2,-31,12,-18,17);ctx.bezierCurveTo(-2,23,18,15,26,0);ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(196,246,255,.34)';for(const [x,y,r] of [[4,-7,4],[-6,-3,3],[7,5,3],[-12,6,2.5]]){ctx.beginPath();ctx.arc(x,y,r,0,6.28);ctx.fill()}
+  ctx.strokeStyle='rgba(166,238,255,.95)';ctx.lineWidth=1.6;for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(-22,s*5);ctx.quadraticCurveTo(-31,s*11,-34,s*15);ctx.stroke();ctx.fillStyle='#baf7ff';ctx.beginPath();ctx.arc(-34,s*15,2.2,0,6.28);ctx.fill()}
+  ctx.fillStyle='#0b2148';ctx.beginPath();ctx.arc(-20,-4,2.2,0,6.28);ctx.arc(-20,4,2.2,0,6.28);ctx.fill();ctx.restore();
+}
+function drawEffects(){
+  for(const e of effects){
+    const a=Math.max(0,e.life/e.max);
+    ctx.save();ctx.strokeStyle=`rgba(126,222,255,${.28*a})`;ctx.lineWidth=1.5;
+    if(e.type==='ripple'){const r=(1-a)*100+8;ctx.beginPath();ctx.arc(e.x,e.y,r,0,6.28);ctx.stroke();ctx.beginPath();ctx.arc(e.x,e.y,r*.65,0,6.28);ctx.stroke()}
+    else{for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(e.x-i*8,e.y-i*4);ctx.lineTo(e.x+e.vx*60*a-i*8,e.y+e.vy*60*a-i*4);ctx.stroke()}}
+    ctx.restore();
+  }
+}
+function render(ts){
+  const b=bounds();ctx.clearRect(0,0,b.w,b.h);
+  for(const p of particles){ctx.fillStyle=`rgba(130,208,255,${p.a})`;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,6.28);ctx.fill()}
+  if(world){for(const f of world.foods){const pulse=1+Math.sin(ts/500+f.phase)*.08;glowDot(f.x,f.y,FOOD_CONFIG.radius*pulse,.9)}drawEffects();drawCreature(world.creature)}
+}
+function renderUI(){
+  if(!world)return;const c=world.creature;
+  ui.lifeName.textContent=world.name;ui.energy.textContent=c.energy.toFixed(0);ui.fill.style.width=`${c.energy}%`;
+  ui.state.textContent=c.alive?'Alive':'Dead';ui.state.style.color=c.alive?'#7cf0c2':'#ff9d9d';ui.eaten.textContent=c.eaten;
+  const age=(world.diedAt||now())-world.bornAt;ui.aliveFor.textContent=fmtDuration(age);ui.day.textContent=Math.floor(age/86400000)+1;
+  const left=Math.max(0,DAILY_FOOD-world.foodUsed);ui.foodLeft.textContent=left;ui.addFood.disabled=!c.alive||left<=0;
+  ui.foodDots.innerHTML='';for(let i=0;i<DAILY_FOOD;i++){const d=document.createElement('span');d.className='dot '+(i<left?'on':'');ui.foodDots.appendChild(d)}
+  const sec=Math.floor(age/1000);ui.clock.textContent=`${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor((sec%3600)/60)).padStart(2,'0')}`;
+  ui.topState.textContent=paused?'暫停':(c.alive?'運作中':'已死亡');
+}
+function renderArchive(){
+  const a=getArchive();ui.archive.innerHTML=a.length?a.map(x=>`<div class="past"><strong>${escapeHtml(x.name)}</strong><br>Born ${new Date(x.bornAt).toLocaleDateString()} · Lived ${fmtDuration(x.lived)} · Food ${x.eaten}</div>`).join(''):'<div class="hint">還沒有過去的生命。</div>'
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;update(dt);render(ts);renderUI();requestAnimationFrame(loop)}
-ui.add.onclick=()=>world.foods.push(food());ui.pause.onclick=()=>paused=!paused;ui.restart.onclick=reset;window.addEventListener('resize',()=>{resize();if(world){const b=bounds();world.creature.x=clamp(world.creature.x,20,b.w-20);world.creature.y=clamp(world.creature.y,20,b.h-20)}});reset();requestAnimationFrame(loop);window.MinimalLife={FOOD_CONFIG,CREATURE_CONFIG,getWorld:()=>world,restart:reset};
+
+ui.addFood.onclick=()=>{if(!world?.creature.alive)return;const left=DAILY_FOOD-world.foodUsed;if(left<=0)return;world.foods.push(randomFood());world.foodUsed++;save();renderUI()}
+ui.pause.onclick=()=>paused=!paused;
+ui.birth.onclick=openBirth;ui.newLifeFromDeath.onclick=openBirth;
+ui.confirmBirth.onclick=()=>birth(ui.nameInput.value);
+ui.nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')birth(ui.nameInput.value)});
+
+function pointFromEvent(e){
+  const r=canvas.getBoundingClientRect();
+  return{x:(e.clientX-r.left),y:(e.clientY-r.top)}
+}
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointerDown={...pointFromEvent(e),t:performance.now()}})
+canvas.addEventListener('pointerup',e=>{
+  if(!pointerDown)return;const p=pointFromEvent(e),dx=p.x-pointerDown.x,dy=p.y-pointerDown.y,d=Math.hypot(dx,dy);
+  if(d<14)addRipple(p.x,p.y);else addCurrent(pointerDown.x,pointerDown.y,dx/d,dy/d,Math.min(2,d/80));
+  pointerDown=null;
+})
+window.addEventListener('resize',()=>{resize();ensurePosition()});
+window.addEventListener('beforeunload',save);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
+
+load();renderArchive();requestAnimationFrame(loop);
 })();
 </script>
-</body></html>
+</body>
+</html>
