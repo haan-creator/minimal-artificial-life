@@ -2,12 +2,15 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="theme-color" content="#07162d"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png"/>
 <link rel="icon" type="image/png" href="./apple-touch-icon.png"/>
+<link rel="manifest" href="./site.webmanifest"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Minimal Life"/>
 <meta name="application-name" content="Minimal Life"/>
 <title>Minimal Artificial Life v0.3</title>
@@ -62,6 +65,76 @@ input{width:100%;border:1px solid rgba(139,190,255,.25);background:#081a34;color
   .card.controls{grid-column:auto}
   .title{font-size:15px}
 }
+
+/* v0.4 responsive information hierarchy */
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-head h2{margin:0}
+.life-state{font-size:11px;color:var(--green)}
+.stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.stat-pair>div{display:flex;flex-direction:column;gap:3px;padding:8px 9px;border-radius:12px;background:rgba(8,26,52,.28)}
+.stat-pair strong{font-size:12px;font-weight:600}
+.energy-line{display:flex;align-items:flex-end;justify-content:space-between;margin-top:12px}
+.compact-row{margin-bottom:0}
+.food-count{font-size:12px;font-variant-numeric:tabular-nums;color:#b9d7f7}
+.food-action{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-top:10px}
+.food-action button{margin:0}
+.microcopy{margin-top:8px}
+.primary-stack,.secondary-stack{display:flex;flex-direction:column;gap:12px}
+.fold{border-radius:16px;background:rgba(15,37,72,.60);border:1px solid rgba(141,190,255,.16);overflow:hidden}
+.fold summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;padding:12px 14px;font-size:12px;color:#d8e8ff;user-select:none}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::after{content:"›";font-size:18px;color:#7fa3cf;margin-left:4px;transform-origin:center;transition:transform .18s ease}
+.fold[open] summary::after{transform:rotate(90deg)}
+.fold-icon{color:#8fe6ff;text-align:center}
+.fold-meta{font-size:10px;color:#718fb5}
+.fold-body{padding:0 14px 13px;border-top:1px solid rgba(141,190,255,.10);padding-top:12px}
+.control-list button:first-child{margin-top:0}
+.secondary-danger{color:#c9d9ee}
+.archive{max-height:210px}
+@media (min-width:901px){
+  .side{max-height:calc(100dvh - 72px);overflow:auto;padding-right:2px}
+}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .side{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+  .primary-stack{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .secondary-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .fold summary{grid-template-columns:22px 1fr auto;padding:11px 12px}
+  .fold-meta{display:none}
+  .fold[open]{grid-column:1/-1}
+}
+@media (orientation:landscape) and (max-height:650px) and (max-width:1000px){
+  body{height:100dvh;overflow:hidden;padding:8px max(8px,env(safe-area-inset-right)) 8px max(8px,env(safe-area-inset-left))}
+  .app{height:100%;display:flex;flex-direction:column}
+  .top{flex:0 0 auto;margin:2px 2px 7px}
+  .layout{flex:1;min-height:0;grid-template-columns:minmax(0,1fr) clamp(220px,31vw,270px);gap:9px}
+  .world{min-height:0;height:100%}
+  canvas{height:100%}
+  .side{display:flex;min-height:0;max-height:100%;overflow:auto;gap:7px;padding-right:2px}
+  .primary-stack{display:flex;gap:7px}
+  .card{padding:11px 12px;border-radius:16px}
+  .card h2{font-size:13px}
+  .stat-pair{margin-top:8px;gap:6px}
+  .stat-pair>div{padding:6px 7px}
+  .energy-line{margin-top:8px}
+  .bar{margin:5px 0 7px;height:9px}
+  .row{margin:5px 0}
+  .big{font-size:16px}
+  .food-action{margin-top:7px;gap:8px}
+  button{padding:8px 9px;margin-top:6px;font-size:11px}
+  .microcopy{display:none}
+  .secondary-stack{display:flex;gap:6px}
+  .fold summary{padding:8px 10px}
+  .fold-body{padding:9px 10px 10px}
+  .foot{display:none}
+}
+@media (orientation:portrait) and (max-width:700px){
+  .world,canvas{height:54dvh;min-height:54dvh}
+  .primary-stack{grid-template-columns:1fr}
+  .secondary-stack{grid-template-columns:1fr}
+  .fold[open]{grid-column:auto}
+}
+
 </style>
 </head>
 <body>
@@ -84,39 +157,59 @@ input{width:100%;border:1px solid rgba(139,190,255,.25);background:#081a34;color
     </div>
 
     <aside class="side">
-      <section class="card">
-        <h2 id="lifeName">Unnamed Life</h2>
-        <div class="row"><span class="label">Day</span><span class="value" id="day">1</span></div>
-        <div class="row"><span class="label">Alive for</span><span class="value" id="aliveFor">0m</span></div>
-        <div class="row"><span class="label">Energy</span><span class="value big"><span id="energy">100</span> / 100</span></div>
-        <div class="bar"><div class="fill" id="fill"></div></div>
-        <div class="row"><span class="label">State</span><span class="value" id="state">Alive</span></div>
-        <div class="row"><span class="label">Food Eaten</span><span class="value" id="eaten">0</span></div>
-      </section>
+      <div class="primary-stack">
+        <section class="card life-card">
+          <div class="card-head">
+            <h2 id="lifeName">Unnamed Life</h2>
+            <span class="life-state value" id="state">Alive</span>
+          </div>
+          <div class="stat-pair">
+            <div><span class="label">Day</span><strong id="day">1</strong></div>
+            <div><span class="label">Alive for</span><strong id="aliveFor">0m</strong></div>
+          </div>
+          <div class="energy-line">
+            <span class="label">Energy</span>
+            <span class="value big"><span id="energy">100</span> / 100</span>
+          </div>
+          <div class="bar"><div class="fill" id="fill"></div></div>
+          <div class="row compact-row"><span class="label">Food Eaten</span><span class="value" id="eaten">0</span></div>
+        </section>
 
-      <section class="card">
-        <h2>Daily Food</h2>
-        <div class="row"><span class="label">今日剩餘</span><span class="value"><span id="foodLeft">3</span> / 3</span></div>
-        <div class="fooddots" id="foodDots"></div>
-        <button id="addFood">＋ Add Food</button>
-        <div class="hint" style="margin-top:8px">每天最多投放 3 份，不累積到隔天。</div>
-      </section>
+        <section class="card food-card">
+          <div class="card-head">
+            <h2>Daily Food</h2>
+            <span class="food-count"><span id="foodLeft">3</span> / 3</span>
+          </div>
+          <div class="food-action">
+            <div class="fooddots" id="foodDots"></div>
+            <button id="addFood">＋ Add Food</button>
+          </div>
+          <div class="hint microcopy">每天最多投放 3 份，不累積到隔天。</div>
+        </section>
+      </div>
 
-      <section class="card">
-        <h2>Environment</h2>
-        <div class="hint">滑動水面：產生短暫水流。<br>點擊水面：產生漣漪。<br>你不能直接控制牠，只能改變牠所在的世界。</div>
-      </section>
+      <nav class="secondary-stack" aria-label="Additional controls">
+        <details class="fold" id="environmentFold">
+          <summary><span class="fold-icon">≈</span><span>Environment</span><span class="fold-meta">Swipe / Tap</span></summary>
+          <div class="fold-body hint">
+            <strong>滑動</strong>產生短暫水流；<strong>點擊</strong>產生漣漪。<br>
+            你不能直接控制牠，只能改變牠所在的世界。
+          </div>
+        </details>
 
-      <section class="card">
-        <h2>Past Lives</h2>
-        <div class="archive" id="archive"></div>
-      </section>
+        <details class="fold" id="pastLivesFold">
+          <summary><span class="fold-icon">◌</span><span>Past Lives</span><span class="fold-meta">History</span></summary>
+          <div class="fold-body"><div class="archive" id="archive"></div></div>
+        </details>
 
-      <section class="card controls">
-        <h2>Controls</h2>
-        <button id="pause">Ⅱ Pause / Resume</button>
-        <button id="birth">＋ Birth New Life</button>
-      </section>
+        <details class="fold" id="moreFold">
+          <summary><span class="fold-icon">•••</span><span>More</span><span class="fold-meta">System</span></summary>
+          <div class="fold-body control-list">
+            <button id="pause">Ⅱ Pause / Resume</button>
+            <button id="birth" class="secondary-danger">＋ Birth New Life</button>
+          </div>
+        </details>
+      </nav>
     </aside>
   </div>
 
@@ -316,5 +409,16 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 load();renderArchive();requestAnimationFrame(loop);
 })();
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(err => {
+      console.warn('Service Worker registration failed:', err);
+    });
+  });
+}
+</script>
+
 </body>
 </html>
