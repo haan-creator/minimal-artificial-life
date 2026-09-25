@@ -1,0 +1,15 @@
+{
+  "name": "葉羊的小山丘",
+  "short_name": "葉羊",
+  "description": "一隻把葉綠體藏在背上的生物。餵牠、給牠光，牠就能自己活下去。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#A4BB86",
+  "theme_color": "#A4BB86",
+  "icons": [
+    { "src": "./apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
